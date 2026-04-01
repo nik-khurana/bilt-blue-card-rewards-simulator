@@ -1,6 +1,7 @@
 # Bilt Blue Status Rewards Calculator
 
 This is a modern, single-page web application to calculate and compare your Bilt Blue Card Rewards using the two available approaches:
+**https://nik-khurana.github.io/bilt-blue-card-rewards-simulator/
 
 1. **Way 1: Housing Rewards:** Base points + Bonus rent points based on your Everyday Spend to Rent ratio.
 2. **Way 2: Cash Back Alternative:** Standard points + 4% Bilt Cash on non-bonus everyday spend.
