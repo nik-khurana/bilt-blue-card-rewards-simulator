@@ -141,7 +141,8 @@
                             </div>
                             <div class="flex justify-between border-b border-gray-100 pb-3">
                                 <span class="text-gray-500 font-medium text-sm">Rent Bonus Multiplier</span>
-                                <span class="font-bold text-blue-600 bg-blue-50 px-2 rounded">{{ way1.mult }}x</span>
+                                <span class="font-bold text-blue-600 bg-blue-50 px-2 rounded" v-if="way1.mult > 0">{{ way1.mult }}x</span>
+                                <span class="font-bold text-blue-600 bg-blue-50 px-2 rounded" v-else>Base</span>
                             </div>
                             <div class="flex justify-between pb-1">
                                 <span class="text-gray-500 font-medium text-sm">Points from Rent</span>
@@ -249,12 +250,23 @@
 
                     let ratio = r > 0 ? totalS / r : 0;
                     let mult = 0;
-                    if (ratio >= 1.0) mult = 1.25;
-                    else if (ratio >= 0.75) mult = 1.0;
-                    else if (ratio >= 0.50) mult = 0.75;
-                    else if (ratio >= 0.25) mult = 0.50;
+                    let rentPts = 250; // base points if threshold not met
 
-                    let rentPts = Math.floor(r * mult);
+                    if (ratio >= 1.0) {
+                        mult = 1.25;
+                        rentPts = Math.floor(r * mult);
+                    } else if (ratio >= 0.75) {
+                        mult = 1.0;
+                        rentPts = Math.floor(r * mult);
+                    } else if (ratio >= 0.50) {
+                        mult = 0.75;
+                        rentPts = Math.floor(r * mult);
+                    } else if (ratio >= 0.25) {
+                        mult = 0.50;
+                        rentPts = Math.floor(r * mult);
+                    } else {
+                        // mult is 0, rentPts is 250
+                    }
 
                     return {
                         pts1st,
