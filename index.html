@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilt Blue Card Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        [v-cloak] { display: none; }
+
+        /* Remove default number input arrows for a cleaner UI */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="bg-[#F8F9FA] text-[#1D1D1F] font-sans antialiased h-screen w-screen overflow-hidden flex justify-center items-center selection:bg-blue-200 selection:text-blue-900">
+    <div id="app" v-cloak class="w-full max-w-[1400px] h-full max-h-[900px] flex flex-col p-4 lg:p-8 gap-6">
+
+        <!-- Header -->
+        <header class="flex-shrink-0 flex justify-between items-end px-2">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">Bilt Rewards Optimizer</h1>
+                <p class="text-gray-500 font-medium mt-1">Blue Tier Calculator</p>
+            </div>
+            <div class="text-sm font-medium text-gray-400 pb-1">
+                Made for 1 Screen • No Scrolling
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 min-h-0 flex gap-6">
+
+            <!-- Left Column: Inputs & What If -->
+            <div class="w-[380px] flex flex-col gap-6">
+
+                <!-- Main Inputs Card -->
+                <div class="bg-white rounded-[2rem] shadow-sm flex-1 p-8 flex flex-col justify-center border border-gray-100">
+                    <h2 class="text-xl font-bold tracking-tight mb-6">Monthly Spend</h2>
+
+                    <div class="flex flex-col gap-4">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Monthly Rent</label>
+                            <div class="flex items-center bg-[#F5F5F7] rounded-2xl border border-transparent focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-sm transition-all">
+                                <span class="pl-4 text-gray-400 font-medium">$</span>
+                                <input type="number" v-model.number="rent" class="w-full bg-transparent py-3.5 px-3 outline-none text-gray-900 font-bold" min="0">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Spend on 1st</label>
+                            <div class="flex items-center bg-[#F5F5F7] rounded-2xl border border-transparent focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-sm transition-all">
+                                <span class="pl-4 text-gray-400 font-medium">$</span>
+                                <input type="number" v-model.number="spend1st" class="w-full bg-transparent py-3.5 px-3 outline-none text-gray-900 font-bold" min="0">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Spend on Rest</label>
+                            <div class="flex items-center bg-[#F5F5F7] rounded-2xl border border-transparent focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-sm transition-all">
+                                <span class="pl-4 text-gray-400 font-medium">$</span>
+                                <input type="number" v-model.number="spendRest" class="w-full bg-transparent py-3.5 px-3 outline-none text-gray-900 font-bold" min="0">
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-4 mt-2">
+                            <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Point Valuation (cents/pt)</label>
+                            <div class="flex items-center bg-[#F5F5F7] rounded-2xl border border-transparent focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-sm transition-all">
+                                <input type="number" step="0.1" v-model.number="pointValuationCents" class="w-full bg-transparent py-3.5 px-4 outline-none text-gray-900 font-bold" min="0.1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- What If Card -->
+                <div class="bg-white rounded-[2rem] shadow-sm h-[250px] p-8 flex flex-col justify-center border border-gray-100">
+                    <h2 class="text-lg font-bold tracking-tight text-blue-900 mb-4">What If Scenario?</h2>
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Total Spend</label>
+                            <div class="flex items-center bg-[#F5F5F7] rounded-xl border border-transparent focus-within:border-blue-400 focus-within:bg-white transition-all">
+                                <span class="pl-3 text-gray-400 text-sm font-medium">$</span>
+                                <input type="number" v-model.number="whatIfTotalSpend" class="w-full bg-transparent py-2.5 px-2 outline-none text-gray-900 text-sm font-bold" min="0">
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Monthly Rent</label>
+                            <div class="flex items-center bg-[#F5F5F7] rounded-xl border border-transparent focus-within:border-blue-400 focus-within:bg-white transition-all">
+                                <span class="pl-3 text-gray-400 text-sm font-medium">$</span>
+                                <input type="number" v-model.number="whatIfRent" class="w-full bg-transparent py-2.5 px-2 outline-none text-gray-900 text-sm font-bold" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="whatIfTotalSpend > 0 || whatIfRent > 0" class="mt-auto bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                        <p v-if="whatIfWay1TotalValue > whatIfWay2TotalValue" class="text-[13px] text-slate-700 leading-snug">
+                            Go with <span class="font-extrabold text-blue-900">Way 1</span> for max value (<span class="font-bold text-emerald-600">${{ whatIfWay1TotalValue.toFixed(2) }}</span>).
+                        </p>
+                        <p v-else-if="whatIfWay2TotalValue > whatIfWay1TotalValue" class="text-[13px] text-slate-700 leading-snug">
+                            Go with <span class="font-extrabold text-blue-900">Way 2</span> for max value (<span class="font-bold text-emerald-600">${{ whatIfWay2TotalValue.toFixed(2) }}</span>).
+                        </p>
+                        <p v-else class="text-[13px] text-slate-700 leading-snug">
+                            Both ways yield <span class="font-bold text-emerald-600">${{ whatIfWay1TotalValue.toFixed(2) }}</span>.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Results -->
+            <div class="flex-1 flex gap-6">
+
+                <!-- Way 1 Card -->
+                <div class="flex-1 bg-white rounded-[2.5rem] shadow-sm border p-2 flex flex-col relative overflow-hidden transition-all"
+                     :class="way1TotalValue >= way2TotalValue ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-gray-100'">
+
+                    <div class="p-6 pb-5 bg-[#F8F9FA] rounded-[2rem]">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-2xl font-black text-gray-900 tracking-tight">Way 1</h3>
+                                <p class="text-gray-500 font-medium text-sm mt-0.5">Housing Rewards</p>
+                            </div>
+                            <div v-if="way1TotalValue >= way2TotalValue" class="bg-blue-600 text-white px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                                Best Value
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-8 py-6 flex-1 flex flex-col justify-center">
+                        <div class="space-y-4">
+                            <div class="flex justify-between border-b border-gray-100 pb-3">
+                                <span class="text-gray-500 font-medium text-sm">Rent Day Points</span>
+                                <span class="font-bold text-gray-900">{{ way1.pts1st.toLocaleString() }}</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-100 pb-3">
+                                <span class="text-gray-500 font-medium text-sm">Rest of Month Points</span>
+                                <span class="font-bold text-gray-900">{{ way1.ptsRest.toLocaleString() }}</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-100 pb-3">
+                                <span class="text-gray-500 font-medium text-sm">Rent Bonus Multiplier</span>
+                                <span class="font-bold text-blue-600 bg-blue-50 px-2 rounded">{{ way1.mult }}x</span>
+                            </div>
+                            <div class="flex justify-between pb-1">
+                                <span class="text-gray-500 font-medium text-sm">Points from Rent</span>
+                                <span class="font-bold text-blue-600">+{{ way1.rentPts.toLocaleString() }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-[#F8F9FA] rounded-[2rem]">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Total Rewards</p>
+                                <p class="text-4xl font-black text-gray-900 leading-none">{{ way1.totalPts.toLocaleString() }} <span class="text-lg font-bold text-gray-400">pts</span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Points Value (Est.)</p>
+                                <p class="text-3xl font-black text-emerald-500 leading-none">${{ way1TotalValue.toFixed(2) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Way 2 Card -->
+                <div class="flex-1 bg-white rounded-[2.5rem] shadow-sm border p-2 flex flex-col relative overflow-hidden transition-all"
+                     :class="way2TotalValue > way1TotalValue ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-gray-100'">
+
+                    <div class="p-6 pb-5 bg-[#F8F9FA] rounded-[2rem]">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-2xl font-black text-gray-900 tracking-tight">Way 2</h3>
+                                <p class="text-gray-500 font-medium text-sm mt-0.5">Cash Back Hybrid</p>
+                            </div>
+                            <div v-if="way2TotalValue > way1TotalValue" class="bg-blue-600 text-white px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                                Best Value
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-8 py-6 flex-1 flex flex-col justify-center">
+                        <div class="space-y-4">
+                            <div class="flex justify-between border-b border-gray-100 pb-3">
+                                <span class="text-gray-500 font-medium text-sm">Rent Day Points</span>
+                                <span class="font-bold text-gray-900">{{ way2.pts1st.toLocaleString() }}</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-100 pb-3">
+                                <span class="text-gray-500 font-medium text-sm">Rest of Month Points</span>
+                                <span class="font-bold text-gray-900">{{ way2.ptsRest.toLocaleString() }}</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-100 pb-3">
+                                <span class="text-gray-500 font-medium text-sm">Total Points</span>
+                                <span class="font-bold text-gray-900">{{ way2.totalPts.toLocaleString() }}</span>
+                            </div>
+                            <div class="flex justify-between pb-1">
+                                <span class="text-gray-500 font-medium text-sm">Bilt Cash (4% flat)</span>
+                                <span class="font-bold text-emerald-500">+${{ way2.biltCash.toFixed(2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-[#F8F9FA] rounded-[2rem]">
+                        <div class="flex justify-between items-end mb-4 border-b border-gray-200 pb-4">
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Total Rewards</p>
+                                <p class="text-2xl font-black text-gray-900 leading-none">{{ way2.totalPts.toLocaleString() }} <span class="text-sm font-bold text-gray-400">pts</span></p>
+                                <p class="text-2xl font-black text-emerald-500 leading-none mt-1.5">+${{ way2.biltCash.toFixed(2) }} <span class="text-sm font-bold text-emerald-500/70">bilt cash</span></p>
+                            </div>
+                            <div class="text-right pb-1">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Points Value</p>
+                                <p class="text-2xl font-black text-gray-900 leading-none">${{ way2PointsValue.toFixed(2) }}</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest pb-1">Total Combined Value</p>
+                            <p class="text-3xl font-black text-emerald-500 leading-none">${{ way2TotalValue.toFixed(2) }}</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                const rent = ref(2000);
+                const spend1st = ref(500);
+                const spendRest = ref(1500);
+                const pointValuationCents = ref(1.0); // 1 cent per point default
+
+                const whatIfTotalSpend = ref(0);
+                const whatIfRent = ref(0);
+
+                const calculateWay1 = (currentSpend1st, currentSpendRest, currentRent) => {
+                    let s1 = currentSpend1st || 0;
+                    let sR = currentSpendRest || 0;
+                    let r = currentRent || 0;
+                    let totalS = s1 + sR;
+
+                    let pts1st = Math.min(s1, 500) * 2 + Math.max(s1 - 500, 0) * 1;
+                    let ptsRest = sR * 1;
+                    let everydayPts = pts1st + ptsRest;
+
+                    let ratio = r > 0 ? totalS / r : 0;
+                    let mult = 0;
+                    if (ratio >= 1.0) mult = 1.25;
+                    else if (ratio >= 0.75) mult = 1.0;
+                    else if (ratio >= 0.50) mult = 0.75;
+                    else if (ratio >= 0.25) mult = 0.50;
+
+                    let rentPts = Math.floor(r * mult);
+
+                    return {
+                        pts1st,
+                        ptsRest,
+                        everydayPts,
+                        ratio: (ratio * 100).toFixed(1),
+                        mult,
+                        rentPts,
+                        totalPts: everydayPts + rentPts
+                    };
+                };
+
+                const calculateWay2 = (currentSpend1st, currentSpendRest) => {
+                    let s1 = currentSpend1st || 0;
+                    let sR = currentSpendRest || 0;
+
+                    let pts1st = Math.min(s1, 500) * 2 + Math.max(s1 - 500, 0) * 1;
+                    let ptsRest = sR * 1;
+                    let totalPts = pts1st + ptsRest;
+
+                    let allSpendForCash = s1 + sR;
+                    let biltCash = allSpendForCash * 0.04;
+
+                    return {
+                        pts1st,
+                        ptsRest,
+                        totalPts,
+                        allSpendForCash,
+                        biltCash
+                    };
+                };
+
+                const way1 = computed(() => calculateWay1(spend1st.value, spendRest.value, rent.value));
+                const way2 = computed(() => calculateWay2(spend1st.value, spendRest.value));
+
+                const way1TotalValue = computed(() => way1.value.totalPts * (pointValuationCents.value / 100));
+
+                const way2PointsValue = computed(() => way2.value.totalPts * (pointValuationCents.value / 100));
+                const way2TotalValue = computed(() => way2PointsValue.value + way2.value.biltCash);
+
+                // What If calculations
+                const whatIfSpend1st = computed(() => Math.min(whatIfTotalSpend.value || 0, 500));
+                const whatIfSpendRest = computed(() => Math.max(0, (whatIfTotalSpend.value || 0) - 500));
+
+                const whatIfWay1 = computed(() => calculateWay1(whatIfSpend1st.value, whatIfSpendRest.value, whatIfRent.value));
+                const whatIfWay2 = computed(() => calculateWay2(whatIfSpend1st.value, whatIfSpendRest.value));
+
+                const whatIfWay1TotalValue = computed(() => whatIfWay1.value.totalPts * (pointValuationCents.value / 100));
+                const whatIfWay2PointsValue = computed(() => whatIfWay2.value.totalPts * (pointValuationCents.value / 100));
+                const whatIfWay2TotalValue = computed(() => whatIfWay2PointsValue.value + whatIfWay2.value.biltCash);
+
+                return {
+                    rent,
+                    spend1st,
+                    spendRest,
+                    pointValuationCents,
+                    way1,
+                    way2,
+                    way1TotalValue,
+                    way2PointsValue,
+                    way2TotalValue,
+                    whatIfTotalSpend,
+                    whatIfRent,
+                    whatIfWay1TotalValue,
+                    whatIfWay2TotalValue
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
