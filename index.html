@@ -1,18 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilt Rewards Optimizer | Blue Tier Calculator</title>
-    <meta name="description" content="Optimize your Bilt Rewards. Compare Bilt Blue status Housing Rewards (Way 1) against the Cash Back Hybrid (Way 2) based on your rent and everyday spend.">
-    <!-- Google Fonts: Outfit -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#070913">
+    <title>Bilt Blue Card Rewards Optimizer | Way 1 vs Way 2 Simulator</title>
+    <meta name="description"
+        content="Calculate and optimize your Bilt Blue status rewards. Compare Housing Rewards (Way 1) against the 4% Cash Back Hybrid (Way 2) with real-time break-even analysis and spend multipliers.">
+
+    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Vue.js 3 -->
+    <!-- Vue.js 3 CDN -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -20,86 +28,145 @@
                 extend: {
                     colors: {
                         darkbg: '#070913',
-                        cardbg: 'rgba(13, 18, 30, 0.65)',
-                        cardborder: 'rgba(255, 255, 255, 0.06)',
+                        lightbg: '#f8fafc',
+                        cardbg: 'rgba(13, 18, 32, 0.72)',
+                        cardbgElevated: 'rgba(18, 25, 46, 0.85)',
+                        cardborder: 'rgba(255, 255, 255, 0.08)',
+                        cardborderHover: 'rgba(255, 255, 255, 0.16)',
+                        accentIndigo: '#6366f1',
+                        accentCyan: '#06b6d4',
+                        accentEmerald: '#10b981',
                     },
                     fontFamily: {
                         sans: ['Outfit', 'sans-serif'],
+                        num: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+
     <style>
-        [v-cloak] { display: none; }
+        [v-cloak] {
+            display: none;
+        }
+
+        /* Smooth scrolling and root setup */
+        html,
+        body {
+            overflow-x: hidden;
+            font-family: 'Outfit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        /* Safe area spacing for modern mobile phones (iPhone notch/pill) */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 1rem);
+        }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
         }
+
         ::-webkit-scrollbar-track {
-            background: #070913;
+            background: transparent;
         }
+
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(150, 150, 150, 0.25);
             border-radius: 9999px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(150, 150, 150, 0.4);
         }
 
-        /* Glassmorphism Styles */
+        /* Glassmorphism Styles for Light & Dark */
         .glass-card {
-            background: rgba(13, 18, 30, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
         }
 
-        /* Range input styling */
+        .dark .glass-card {
+            background: rgba(13, 18, 32, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card-elevated {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+        }
+
+        .dark .glass-card-elevated {
+            background: rgba(18, 25, 46, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Range slider styling */
         input[type="range"] {
             -webkit-appearance: none;
+            appearance: none;
             width: 100%;
-            height: 5px;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 9999px;
             outline: none;
-            transition: background 0.3s;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 14px;
-            height: 14px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            background: #4f46e5;
+            background: #6366f1;
             cursor: pointer;
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 8px rgba(79, 70, 229, 0.8);
-            transition: transform 0.1s ease-in-out;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 0 14px rgba(99, 102, 241, 0.8), 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.3);
-            background: #6366f1;
+        input[type="range"]::-webkit-slider-thumb:hover,
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.25);
+            background: #818cf8;
+            box-shadow: 0 0 20px rgba(129, 140, 248, 1), 0 3px 6px rgba(0, 0, 0, 0.3);
         }
 
         input[type="range"]::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
-            border: 2px solid #ffffff;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            background: #4f46e5;
+            background: #6366f1;
             cursor: pointer;
-            box-shadow: 0 0 8px rgba(79, 70, 229, 0.8);
-            transition: transform 0.1s ease-in-out;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 0 14px rgba(99, 102, 241, 0.8);
+            transition: transform 0.15s ease;
         }
 
-        input[type="range"]::-moz-range-thumb:hover {
-            transform: scale(1.3);
-            background: #6366f1;
+        input[type="range"]::-moz-range-thumb:hover,
+        input[type="range"]::-moz-range-thumb:active {
+            transform: scale(1.25);
+            background: #818cf8;
+        }
+
+        /* Prevent auto-zoom on iOS by guaranteeing 16px font size */
+        input[type="number"],
+        input[type="text"] {
+            font-size: 16px !important;
         }
 
         /* Number spin button removal */
@@ -108,501 +175,1026 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
         input[type=number] {
             -moz-appearance: textfield;
         }
+
+        /* Glow effects */
+        .glow-indigo {
+            box-shadow: 0 0 35px -5px rgba(99, 102, 241, 0.35);
+        }
+
+        .glow-emerald {
+            box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.35);
+        }
+
+        .glow-cyan {
+            box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.35);
+        }
     </style>
 </head>
-<body class="bg-darkbg text-slate-200 min-h-screen relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-white">
-    
-    <!-- Background Glow Blobs -->
-    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
-    <div class="absolute bottom-[20%] right-[-10%] w-[60%] h-[60%] bg-cyan-500/5 rounded-full blur-[150px] pointer-events-none z-0"></div>
 
-    <div id="app" v-cloak class="w-full max-w-[1400px] mx-auto px-4 py-6 md:p-8 flex flex-col gap-6 relative z-10">
+<body
+    class="bg-slate-50 text-slate-800 dark:bg-darkbg dark:text-slate-200 selection:bg-indigo-500/30 selection:text-white min-h-screen relative">
 
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+    <!-- Ambient Mesh Glow Background -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-opacity duration-500">
+        <!-- Dark mode ambient glows -->
+        <div
+            class="hidden dark:block absolute -top-[15%] -left-[10%] w-[60%] h-[50%] bg-indigo-600/15 rounded-full blur-[140px]">
+        </div>
+        <div
+            class="hidden dark:block absolute top-[35%] -right-[15%] w-[55%] h-[50%] bg-cyan-500/10 rounded-full blur-[160px]">
+        </div>
+        <div
+            class="hidden dark:block absolute -bottom-[10%] left-[20%] w-[50%] h-[40%] bg-emerald-500/10 rounded-full blur-[150px]">
+        </div>
+
+        <!-- Light mode ambient glows -->
+        <div
+            class="dark:hidden absolute -top-[15%] -left-[10%] w-[60%] h-[50%] bg-indigo-300/35 rounded-full blur-[140px]">
+        </div>
+        <div
+            class="dark:hidden absolute top-[35%] -right-[15%] w-[55%] h-[50%] bg-sky-200/40 rounded-full blur-[160px]">
+        </div>
+        <div
+            class="dark:hidden absolute -bottom-[10%] left-[20%] w-[50%] h-[40%] bg-emerald-200/30 rounded-full blur-[150px]">
+        </div>
+    </div>
+
+    <div id="app" v-cloak
+        class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 flex flex-col gap-6 sm:gap-8 pb-28 sm:pb-16">
+
+        <!-- Top Header & Global Controls -->
+        <header
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-slate-200 dark:border-white/[0.08]">
+            <div class="flex items-center gap-3.5">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/25 flex-shrink-0">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-400">Bilt Rewards Optimizer</h1>
-                    <p class="text-xs md:text-sm font-semibold text-slate-400 tracking-wider uppercase mt-0.5">Blue Tier Calculator</p>
+                    <div class="flex items-center gap-2">
+                        <h1
+                            class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600 dark:from-white dark:via-slate-100 dark:to-slate-400">
+                            Bilt Rewards Optimizer
+                        </h1>
+                        <span
+                            class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-500/30">
+                            Blue Tier
+                        </span>
+                    </div>
+                    <p class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                        Housing Rewards vs. 4% Cash Back Calculator
+                    </p>
                 </div>
             </div>
-            <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-slate-400 font-semibold">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Responsive Dashboard • Real-time Calculation
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center flex-wrap gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+                <!-- Theme Toggle Button (Light/Dark) -->
+                <button @click="toggleTheme"
+                    class="p-2 sm:px-3 rounded-xl text-xs font-semibold bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-95 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                    :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'" aria-label="Toggle theme">
+                    <!-- Sun icon when in dark mode -->
+                    <svg v-if="isDark" class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <!-- Moon icon when in light mode -->
+                    <svg v-else class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                    <span class="hidden sm:inline font-bold">{{ isDark ? 'Light' : 'Dark' }}</span>
+                </button>
+
+                <!-- Timeframe Switcher (Monthly vs Annual) -->
+                <div
+                    class="flex items-center bg-white dark:bg-slate-900/80 p-1 rounded-xl border border-slate-200 dark:border-white/[0.08] shadow-sm dark:shadow-inner">
+                    <button @click="timeframe = 'monthly'"
+                        :class="timeframe === 'monthly' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200">
+                        Monthly
+                    </button>
+                    <button @click="timeframe = 'annual'"
+                        :class="timeframe === 'annual' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1">
+                        <span>Annual</span>
+                        <span class="text-[10px] px-1 py-0.2 rounded bg-white/20 font-black">12x</span>
+                    </button>
+                </div>
+
+                <!-- Rules Explainer Modal Trigger -->
+                <button @click="showRulesModal = true"
+                    class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:bg-slate-200 dark:active:bg-white/15 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5 transition-all cursor-pointer">
+                    <svg class="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>How it Works</span>
+                </button>
+
+                <!-- Quick Reset to defaults -->
+                <button @click="resetDefaults" title="Reset to standard defaults"
+                    class="p-2 rounded-xl text-xs font-semibold bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:bg-slate-200 dark:active:bg-white/15 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10 shadow-sm transition-all cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
+                    </svg>
+                </button>
             </div>
         </header>
 
-        <!-- Mobile Navigation Tabs -->
-        <div class="flex lg:hidden bg-slate-950/60 p-1 rounded-2xl border border-white/5 relative z-10">
-            <button @click="activeTab = 'calculator'" 
-                    class="flex-1 py-3 px-4 text-xs md:text-sm font-bold rounded-xl transition-all duration-300"
-                    :class="activeTab === 'calculator' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' : 'text-slate-400 hover:text-slate-200'">
-                Calculator
-            </button>
-            <button @click="activeTab = 'whatif'" 
-                    class="flex-1 py-3 px-4 text-xs md:text-sm font-bold rounded-xl transition-all duration-300"
-                    :class="activeTab === 'whatif' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' : 'text-slate-400 hover:text-slate-200'">
-                What-If Simulator
-            </button>
-        </div>
+        <!-- Main Workspace: Responsive 2-Column Desktop Grid / Fluid Mobile Stream -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
 
-        <!-- Main Content -->
-        <main class="flex-1 flex flex-col lg:flex-row gap-6 lg:gap-8 min-h-0">
+            <!-- LEFT COLUMN: Parameter Controls & Valuation (5 cols on lg) -->
+            <div class="lg:col-span-5 flex flex-col gap-6" id="input-parameters-section">
 
-            <!-- Left Column: Inputs & Scenario Builder -->
-            <div class="w-full lg:w-[400px] flex flex-col gap-6 flex-shrink-0">
-
-                <!-- Monthly Inputs Card -->
-                <section class="glass-card rounded-[2rem] p-6 flex flex-col gap-5"
-                     :class="activeTab === 'calculator' ? 'block' : 'hidden lg:block'">
-                    <div>
-                        <h2 class="text-lg font-bold text-white tracking-tight">Monthly Parameters</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Input your actual rent and card spending</p>
+                <!-- Primary Inputs Card -->
+                <section class="glass-card rounded-3xl p-5 sm:p-7 flex flex-col gap-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2
+                                class="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                                <span>Monthly Spending Inputs</span>
+                            </h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Adjust sliders or type directly
+                                to see instant results</p>
+                        </div>
+                        <span
+                            class="text-[11px] font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/5">
+                            Real-time
+                        </span>
                     </div>
 
-                    <div class="flex flex-col gap-5">
-                        <!-- Rent Input -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label for="calc-rent-input" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Monthly Rent</label>
-                                <div class="flex items-center gap-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg">
-                                    <span class="text-xs text-slate-500 font-medium">$</span>
-                                    <input id="calc-rent-input" type="number" v-model.number="rent" class="w-16 bg-transparent outline-none text-white text-xs font-bold text-right" min="0">
+                    <div class="flex flex-col gap-6">
+
+                        <!-- 1. Rent Input -->
+                        <div class="flex flex-col gap-2.5">
+                            <div class="flex justify-between items-center">
+                                <label for="rent-slider"
+                                    class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                                    <span class="text-sm">🏠</span>
+                                    <span>Monthly Rent</span>
+                                </label>
+                                <div
+                                    class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 px-3 py-1 rounded-xl shadow-inner focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                                    <span class="text-slate-400 font-bold text-sm">$</span>
+                                    <input id="rent-slider" type="number" v-model.number="rent" min="0" max="10000"
+                                        step="50"
+                                        class="w-20 bg-transparent text-slate-900 dark:text-white font-num font-extrabold text-right focus:outline-none">
                                 </div>
                             </div>
-                            <input type="range" v-model.number="rent" min="500" max="6000" step="100" class="w-full mb-2">
-                            <div class="flex flex-wrap gap-1">
-                                <button @click="rent = 1000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$1,000</button>
-                                <button @click="rent = 1500" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$1,500</button>
-                                <button @click="rent = 2000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$2,000</button>
-                                <button @click="rent = 2500" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$2,500</button>
-                                <button @click="rent = 3000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$3,000</button>
+
+                            <!-- Slider with custom styling -->
+                            <input type="range" v-model.number="rent" min="500" max="6000" step="50"
+                                :style="getSliderBackground(rent, 500, 6000, '#6366f1')" class="w-full">
+
+                            <!-- Quick-preset Chips & Micro-steppers -->
+                            <div class="flex items-center justify-between gap-1 mt-1">
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button v-for="val in [1000, 1500, 2000, 2500, 3000]" :key="val" @click="rent = val"
+                                        :class="rent === val ? 'bg-indigo-600 text-white border-indigo-400' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200/80 dark:bg-white/5 dark:text-slate-300 dark:border-white/5 dark:hover:bg-white/10'"
+                                        class="px-2 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer">
+                                        ${{ (val / 1000).toFixed(val % 1000 !== 0 ? 1 : 0) }}k
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button @click="rent = Math.max(500, rent - 100)"
+                                        class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 active:bg-indigo-500/30 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-xs font-bold border border-slate-200 dark:border-white/5"
+                                        title="Minus $100">-</button>
+                                    <button @click="rent = Math.min(8000, rent + 100)"
+                                        class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 active:bg-indigo-500/30 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-xs font-bold border border-slate-200 dark:border-white/5"
+                                        title="Plus $100">+</button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Spend on 1st -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label for="calc-spend1st-input" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Rent Day Spend (1st)</label>
-                                <div class="flex items-center gap-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg">
-                                    <span class="text-xs text-slate-500 font-medium">$</span>
-                                    <input id="calc-spend1st-input" type="number" v-model.number="spend1st" class="w-16 bg-transparent outline-none text-white text-xs font-bold text-right" min="0">
+                        <!-- 2. Rent Day Spend (1st of Month) -->
+                        <div class="flex flex-col gap-2.5">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <label for="spend1st-slider"
+                                        class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                                        <span class="text-sm">⚡</span>
+                                        <span>Rent Day Spend (1st)</span>
+                                    </label>
+                                    <span class="text-[10px] text-amber-600 dark:text-amber-400/90 font-medium">Earns 2x
+                                        points on first $500</span>
+                                </div>
+                                <div
+                                    class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 px-3 py-1 rounded-xl shadow-inner focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                                    <span class="text-slate-400 font-bold text-sm">$</span>
+                                    <input id="spend1st-slider" type="number" v-model.number="spend1st" min="0"
+                                        max="5000" step="25"
+                                        class="w-20 bg-transparent text-slate-900 dark:text-white font-num font-extrabold text-right focus:outline-none">
                                 </div>
                             </div>
-                            <input type="range" v-model.number="spend1st" min="0" max="2000" step="50" class="w-full mb-2">
-                            <div class="flex flex-wrap gap-1">
-                                <button @click="spend1st = 100" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$100</button>
-                                <button @click="spend1st = 250" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$250</button>
-                                <button @click="spend1st = 500" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$500</button>
-                                <button @click="spend1st = 1000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$1,000</button>
+
+                            <input type="range" v-model.number="spend1st" min="0" max="2000" step="25"
+                                :style="getSliderBackground(spend1st, 0, 2000, '#eab308')" class="w-full">
+
+                            <div class="flex items-center justify-between gap-1 mt-1">
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button v-for="val in [100, 250, 500, 750, 1000]" :key="val" @click="spend1st = val"
+                                        :class="spend1st === val ? 'bg-amber-500 text-slate-950 font-extrabold border-amber-400' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200/80 dark:bg-white/5 dark:text-slate-300 dark:border-white/5 dark:hover:bg-white/10'"
+                                        class="px-2 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer">
+                                        ${{ val }}
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button @click="spend1st = Math.max(0, spend1st - 50)"
+                                        class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 active:bg-amber-500/30 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-xs font-bold border border-slate-200 dark:border-white/5">-</button>
+                                    <button @click="spend1st = Math.min(3000, spend1st + 50)"
+                                        class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 active:bg-amber-500/30 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-xs font-bold border border-slate-200 dark:border-white/5">+</button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Spend on Rest -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label for="calc-spendrest-input" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Everyday Spend (Month)</label>
-                                <div class="flex items-center gap-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg">
-                                    <span class="text-xs text-slate-500 font-medium">$</span>
-                                    <input id="calc-spendrest-input" type="number" v-model.number="spendRest" class="w-16 bg-transparent outline-none text-white text-xs font-bold text-right" min="0">
+                        <!-- 3. Everyday Spend (Rest of Month) -->
+                        <div class="flex flex-col gap-2.5">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <label for="spendrest-slider"
+                                        class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                                        <span class="text-sm">💳</span>
+                                        <span>Rest of Month Spend</span>
+                                    </label>
+                                    <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Earns 1x
+                                        points (or 4% cash back)</span>
+                                </div>
+                                <div
+                                    class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 px-3 py-1 rounded-xl shadow-inner focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                                    <span class="text-slate-400 font-bold text-sm">$</span>
+                                    <input id="spendrest-slider" type="number" v-model.number="spendRest" min="0"
+                                        max="15000" step="50"
+                                        class="w-20 bg-transparent text-slate-900 dark:text-white font-num font-extrabold text-right focus:outline-none">
                                 </div>
                             </div>
-                            <input type="range" v-model.number="spendRest" min="0" max="8000" step="100" class="w-full mb-2">
-                            <div class="flex flex-wrap gap-1">
-                                <button @click="spendRest = 500" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$500</button>
-                                <button @click="spendRest = 1000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$1,000</button>
-                                <button @click="spendRest = 1500" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$1,500</button>
-                                <button @click="spendRest = 2000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$2,000</button>
-                                <button @click="spendRest = 3000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$3,000</button>
+
+                            <input type="range" v-model.number="spendRest" min="0" max="8000" step="50"
+                                :style="getSliderBackground(spendRest, 0, 8000, '#06b6d4')" class="w-full">
+
+                            <div class="flex items-center justify-between gap-1 mt-1">
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button v-for="val in [500, 1000, 1500, 2000, 3000]" :key="val"
+                                        @click="spendRest = val"
+                                        :class="spendRest === val ? 'bg-cyan-600 text-white border-cyan-400' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200/80 dark:bg-white/5 dark:text-slate-300 dark:border-white/5 dark:hover:bg-white/10'"
+                                        class="px-2 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer">
+                                        ${{ (val / 1000).toFixed(val % 1000 !== 0 ? 1 : 0) }}k
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button @click="spendRest = Math.max(0, spendRest - 100)"
+                                        class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 active:bg-cyan-500/30 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-xs font-bold border border-slate-200 dark:border-white/5">-</button>
+                                    <button @click="spendRest = Math.min(15000, spendRest + 100)"
+                                        class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 active:bg-cyan-500/30 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center text-xs font-bold border border-slate-200 dark:border-white/5">+</button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Point Valuation -->
-                        <div class="border-t border-white/5 pt-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <label for="calc-valuation-input" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Point Valuation</label>
-                                <div class="flex items-center gap-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg">
-                                    <input id="calc-valuation-input" type="number" step="0.1" v-model.number="pointValuationCents" class="w-10 bg-transparent outline-none text-white text-xs font-bold text-right" min="0.1">
-                                    <span class="text-[10px] text-slate-500 font-medium">¢/pt</span>
-                                </div>
+                        <!-- Total Spend Summary Pill -->
+                        <div
+                            class="bg-slate-100/80 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.07] rounded-2xl p-3.5 flex items-center justify-between">
+                            <div>
+                                <span
+                                    class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Combined
+                                    Card Spend</span>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-300">${{ (spend1st +
+                                    spendRest).toLocaleString() }} <span class="text-xs text-slate-500 font-normal">per
+                                        month</span></p>
                             </div>
-                            <input type="range" v-model.number="pointValuationCents" min="0.5" max="2.5" step="0.1" class="w-full mb-2">
-                            <div class="flex flex-wrap gap-1">
-                                <button @click="pointValuationCents = 0.8" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">0.8¢</button>
-                                <button @click="pointValuationCents = 1.0" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">1.0¢</button>
-                                <button @click="pointValuationCents = 1.2" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">1.2¢</button>
-                                <button @click="pointValuationCents = 1.5" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">1.5¢</button>
-                                <button @click="pointValuationCents = 2.0" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">2.0¢</button>
+                            <div class="text-right">
+                                <span
+                                    class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Everyday
+                                    / Rent Ratio</span>
+                                <p class="text-base font-extrabold"
+                                    :class="parseFloat(way1.ratio) >= 100 ? 'text-emerald-600 dark:text-emerald-400' : parseFloat(way1.ratio) >= 50 ? 'text-indigo-600 dark:text-indigo-400' : 'text-amber-600 dark:text-amber-400'">
+                                    {{ way1.ratio }}%
+                                </p>
                             </div>
                         </div>
+
                     </div>
                 </section>
 
-                <!-- What If Card -->
-                <section class="glass-card rounded-[2rem] p-6 flex flex-col gap-5"
-                     :class="activeTab === 'whatif' ? 'block' : 'hidden lg:block'">
-                    <div>
-                        <h2 class="text-lg font-bold text-white tracking-tight">What-If Playground</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Quickly compare a hypothetical budget</p>
-                    </div>
-
-                    <div class="flex flex-col gap-4">
-                        <!-- Spend Slider -->
+                <!-- Point Valuation & Redemption Power Card -->
+                <section class="glass-card rounded-3xl p-5 sm:p-7 flex flex-col gap-4">
+                    <div class="flex justify-between items-center">
                         <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label for="whatif-spend-input" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Hypothetical Spend</label>
-                                <div class="flex items-center gap-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg">
-                                    <span class="text-xs text-slate-500 font-medium">$</span>
-                                    <input id="whatif-spend-input" type="number" v-model.number="whatIfTotalSpend" class="w-16 bg-transparent outline-none text-white text-xs font-bold text-right" min="0">
-                                </div>
-                            </div>
-                            <input type="range" v-model.number="whatIfTotalSpend" min="0" max="10000" step="100" class="w-full mb-2">
-                            <div class="flex flex-wrap gap-1">
-                                <button @click="whatIfTotalSpend = 500" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$500</button>
-                                <button @click="whatIfTotalSpend = 1000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$1,000</button>
-                                <button @click="whatIfTotalSpend = 2000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$2,000</button>
-                                <button @click="whatIfTotalSpend = 3000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$3,000</button>
-                            </div>
+                            <h3
+                                class="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5">
+                                <span>🎯 Point Valuation (CPP)</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Estimated value per 1 Bilt
+                                Point</p>
                         </div>
-
-                        <!-- Rent Slider -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label for="whatif-rent-input" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Hypothetical Rent</label>
-                                <div class="flex items-center gap-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg">
-                                    <span class="text-xs text-slate-500 font-medium">$</span>
-                                    <input id="whatif-rent-input" type="number" v-model.number="whatIfRent" class="w-16 bg-transparent outline-none text-white text-xs font-bold text-right" min="0">
-                                </div>
-                            </div>
-                            <input type="range" v-model.number="whatIfRent" min="500" max="6000" step="100" class="w-full mb-2">
-                            <div class="flex flex-wrap gap-1">
-                                <button @click="whatIfRent = 1000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$1,000</button>
-                                <button @click="whatIfRent = 1500" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$1,500</button>
-                                <button @click="whatIfRent = 2000" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$2,000</button>
-                                <button @click="whatIfRent = 2500" class="px-2 py-0.5 text-[9px] font-medium bg-white/5 hover:bg-white/10 active:bg-indigo-500/20 text-slate-300 rounded border border-white/5 transition-all cursor-pointer">$2,500</button>
-                            </div>
+                        <div
+                            class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 px-3 py-1 rounded-xl shadow-inner">
+                            <input type="number" step="0.1" min="0.5" max="3.0" v-model.number="pointValuationCents"
+                                class="w-14 bg-transparent text-slate-900 dark:text-white font-num font-extrabold text-right focus:outline-none">
+                            <span class="text-xs text-slate-500 dark:text-slate-400 font-bold">¢/pt</span>
                         </div>
                     </div>
 
-                    <!-- Scenario Results -->
-                    <div v-if="whatIfTotalSpend > 0 || whatIfRent > 0" class="mt-2 bg-slate-950/60 p-4 rounded-2xl border border-white/5">
-                        <p class="text-xs text-slate-400 font-bold mb-3 uppercase tracking-wider">Comparison Result</p>
-                        
-                        <div class="space-y-3.5 mb-4">
-                            <!-- Way 1 Scenario Meter -->
-                            <div>
-                                <div class="flex justify-between text-[11px] mb-1 font-medium">
-                                    <span class="text-slate-300">Way 1 (Housing)</span>
-                                    <span class="text-white font-bold">${{ whatIfWay1TotalValue.toFixed(2) }}</span>
-                                </div>
-                                <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                                    <div class="bg-indigo-500 h-full rounded-full transition-all duration-500"
-                                         :style="{ width: (whatIfWay1TotalValue / Math.max(whatIfWay1TotalValue, whatIfWay2TotalValue, 1) * 100) + '%' }"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Way 2 Scenario Meter -->
-                            <div>
-                                <div class="flex justify-between text-[11px] mb-1 font-medium">
-                                    <span class="text-slate-300">Way 2 (Cash Back)</span>
-                                    <span class="text-white font-bold">${{ whatIfWay2TotalValue.toFixed(2) }}</span>
-                                </div>
-                                <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                                    <div class="bg-cyan-500 h-full rounded-full transition-all duration-500"
-                                         :style="{ width: (whatIfWay2TotalValue / Math.max(whatIfWay1TotalValue, whatIfWay2TotalValue, 1) * 100) + '%' }"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Scenario Recommendation Badge -->
-                        <div class="bg-emerald-950/40 border border-emerald-800/30 rounded-xl p-3 text-emerald-400 text-xs font-semibold leading-relaxed flex items-center gap-2">
-                            <span>🏆</span>
-                            <span v-if="whatIfWay1TotalValue > whatIfWay2TotalValue">
-                                Go with <span class="text-white underline font-bold">Way 1</span> for max value (saves <span class="text-white font-extrabold">${{ (whatIfWay1TotalValue - whatIfWay2TotalValue).toFixed(2) }}/mo</span>)
-                            </span>
-                            <span v-else-if="whatIfWay2TotalValue > whatIfWay1TotalValue">
-                                Go with <span class="text-white underline font-bold">Way 2</span> for max value (saves <span class="text-white font-extrabold">${{ (whatIfWay2TotalValue - whatIfWay1TotalValue).toFixed(2) }}/mo</span>)
-                            </span>
-                            <span v-else>
-                                Both yield the exact same value.
-                            </span>
-                        </div>
+                    <input type="range" v-model.number="pointValuationCents" min="0.6" max="2.5" step="0.1"
+                        :style="getSliderBackground(pointValuationCents, 0.6, 2.5, '#a855f7')" class="w-full">
+
+                    <!-- Presets Chips with context -->
+                    <div class="grid grid-cols-5 gap-1.5">
+                        <button v-for="preset in valuationPresets" :key="preset.val"
+                            @click="pointValuationCents = preset.val"
+                            :class="pointValuationCents === preset.val ? 'bg-purple-600 text-white border-purple-400 shadow-md shadow-purple-600/30' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200/80 dark:bg-white/5 dark:text-slate-300 dark:border-white/5 dark:hover:bg-white/10'"
+                            class="flex flex-col items-center py-2 px-1 rounded-xl border transition-all text-center cursor-pointer">
+                            <span class="text-xs font-black font-num">{{ preset.val }}¢</span>
+                            <span
+                                class="text-[9px] text-slate-500 dark:text-slate-400 font-medium truncate w-full mt-0.5">{{
+                                preset.label }}</span>
+                        </button>
                     </div>
+
                 </section>
 
             </div>
 
-            <!-- Right Column: Results & Comparisons -->
-            <div class="flex-1 flex flex-col gap-6" :class="activeTab === 'calculator' ? 'block' : 'hidden lg:block'">
+            <!-- RIGHT COLUMN: Decision Winner, Comparative Cards, Gauge & Playground (7 cols on lg) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
 
-                <!-- Winner Card -->
-                <section class="glass-card rounded-[2rem] p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden transition-all duration-300"
-                     :class="way1TotalValue >= way2TotalValue ? 'border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.03)]' : 'border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.03)]'">
-                    
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-emerald-400 bg-emerald-950/40 border border-emerald-800/30"
-                                  v-if="way1TotalValue >= way2TotalValue">
-                                Recommended Choice
-                            </span>
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-indigo-400 bg-indigo-950/40 border border-indigo-800/30"
-                                  v-else>
-                                Recommended Choice
-                            </span>
-                        </div>
-                        <h2 class="text-xl md:text-2xl font-black text-white leading-tight">
-                            Use <span :class="way1TotalValue >= way2TotalValue ? 'text-emerald-400' : 'text-indigo-400'">{{ way1TotalValue >= way2TotalValue ? 'Way 1 (Housing)' : 'Way 2 (Cash Back)' }}</span> for Max Value
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                            {{ way1TotalValue >= way2TotalValue 
-                                ? 'Your everyday spend ratio is high enough that housing reward points exceed the value of cash back.' 
-                                : 'Your everyday spend ratio is too low, so the flat 4% cash back hybrid provides greater overall value.' }}
-                        </p>
-                    </div>
-                    
-                    <div class="flex flex-col items-start md:items-end justify-center min-w-[170px] w-full md:w-auto border-t md:border-t-0 md:border-l border-white/5 pt-4 md:pt-0 md:pl-6">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Value Advantage</span>
-                        <span class="text-2xl md:text-3xl font-black" :class="way1TotalValue >= way2TotalValue ? 'text-emerald-400' : 'text-indigo-400'">
-                            +${{ Math.abs(way1TotalValue - way2TotalValue).toFixed(2) }}<span class="text-xs font-semibold text-slate-400">/mo</span>
-                        </span>
-                        <span class="text-[11px] font-semibold text-slate-400 mt-0.5">
-                            (+${{ (Math.abs(way1TotalValue - way2TotalValue) * 12).toFixed(2) }}/year)
-                        </span>
-                    </div>
-                </section>
+                <!-- 1. WINNER DECISION BANNER (Hero Card) -->
+                <section
+                    class="glass-card-elevated rounded-3xl p-6 sm:p-7 relative overflow-hidden transition-all duration-300"
+                    :class="way1TotalValue >= way2TotalValue ? 'border-emerald-500/40 dark:border-emerald-500/30 glow-emerald' : 'border-indigo-500/40 dark:border-indigo-500/30 glow-indigo'">
 
-                <!-- Ratio Gauge Card -->
-                <section class="glass-card rounded-[2rem] p-6 flex flex-col gap-4 relative overflow-hidden">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Everyday Spend to Rent Ratio</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Determines your rent points multiplier</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-xl md:text-2xl font-black text-indigo-400">{{ (way1.ratio) }}%</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Progress Bar Track -->
-                    <div class="mt-4 px-2">
-                        <div class="relative w-full h-3 bg-slate-800 rounded-full">
-                            <!-- Filled Progress Bar -->
-                            <div class="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 transition-all duration-500 ease-out"
-                                 :style="{ width: Math.min(parseFloat(way1.ratio), 100) + '%' }"></div>
-                            
-                            <!-- Marker Dot 25% -->
-                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4.5 h-4.5 rounded-full border-2 border-slate-900 transition-all duration-300"
-                                 :class="parseFloat(way1.ratio) >= 25 ? 'bg-cyan-400 border-cyan-400 shadow-[0_0_8px_#22d3ee]' : 'bg-slate-700'"
-                                 style="left: 25%;"></div>
-                            
-                            <!-- Marker Dot 50% -->
-                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4.5 h-4.5 rounded-full border-2 border-slate-900 transition-all duration-300"
-                                 :class="parseFloat(way1.ratio) >= 50 ? 'bg-cyan-400 border-cyan-400 shadow-[0_0_8px_#22d3ee]' : 'bg-slate-700'"
-                                 style="left: 50%;"></div>
-                            
-                            <!-- Marker Dot 75% -->
-                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4.5 h-4.5 rounded-full border-2 border-slate-900 transition-all duration-300"
-                                 :class="parseFloat(way1.ratio) >= 75 ? 'bg-cyan-400 border-cyan-400 shadow-[0_0_8px_#22d3ee]' : 'bg-slate-700'"
-                                 style="left: 75%;"></div>
-                            
-                            <!-- Marker Dot 100% -->
-                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4.5 h-4.5 rounded-full border-2 border-slate-900 transition-all duration-300"
-                                 :class="parseFloat(way1.ratio) >= 100 ? 'bg-cyan-400 border-cyan-400 shadow-[0_0_8px_#22d3ee]' : 'bg-slate-700'"
-                                 style="left: 100%;"></div>
-                        </div>
-                        
-                        <!-- Marker Labels -->
-                        <div class="relative w-full h-8 mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 0%;">Flat 250</span>
-                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 25%;">0.50x</span>
-                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 50%;">0.75x</span>
-                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 75%;">1.00x</span>
-                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 100%;">1.25x</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Next Tier Dynamic Tip -->
-                    <div class="bg-indigo-950/30 rounded-2xl p-3.5 border border-indigo-900/30 text-xs text-indigo-200 flex items-center gap-2.5">
-                        <span class="text-base flex-shrink-0">💡</span>
-                        <span class="font-medium">{{ nextTierTip }}</span>
-                    </div>
-                </section>
+                    <!-- Ambient corner glow -->
+                    <div class="absolute -top-12 -right-12 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-40"
+                        :class="way1TotalValue >= way2TotalValue ? 'bg-emerald-500' : 'bg-indigo-500'"></div>
 
-                <!-- Comparison Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    <!-- Way 1 Card -->
-                    <article class="glass-card rounded-[2rem] p-6 flex flex-col relative transition-all duration-300 hover:scale-[1.01]"
-                         :class="way1TotalValue >= way2TotalValue ? 'border-emerald-500/30 bg-emerald-950/5 shadow-[0_0_30px_rgba(16,185,129,0.04)]' : 'border-white/5'">
-                        
-                        <!-- Header -->
-                        <div class="flex justify-between items-start mb-6">
-                            <div>
-                                <span class="text-[10px] font-bold text-indigo-400 tracking-widest uppercase">Option A</span>
-                                <h3 class="text-xl font-extrabold text-white mt-0.5">Way 1: Housing</h3>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Bilt Rent Multiplier Method</p>
-                            </div>
-                            <span v-if="way1TotalValue >= way2TotalValue" 
-                                  class="px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 uppercase tracking-wider border border-emerald-500/30">
-                                Best Value
-                            </span>
-                        </div>
-                        
-                        <!-- Breakdown -->
-                        <div class="flex-1 flex flex-col gap-3 text-sm">
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Rent Day Points (2x/1x)</span>
-                                <span class="font-bold text-white">{{ way1.pts1st.toLocaleString() }} <span class="text-xs font-normal text-slate-500">pts</span></span>
-                            </div>
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Rest of Month Points (1x)</span>
-                                <span class="font-bold text-white">{{ way1.ptsRest.toLocaleString() }} <span class="text-xs font-normal text-slate-500">pts</span></span>
-                            </div>
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Everyday Points Total</span>
-                                <span class="font-bold text-white">{{ way1.everydayPts.toLocaleString() }} <span class="text-xs font-normal text-slate-500">pts</span></span>
-                            </div>
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Rent Bonus Multiplier</span>
-                                <span class="font-bold text-indigo-400 bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-900/30 text-xs">
-                                    {{ way1.mult > 0 ? way1.mult + 'x' : 'Base (250 pts)' }}
+                    <div
+                        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 relative z-10">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2.5">
+                                <span
+                                    class="px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
+                                    :class="way1TotalValue >= way2TotalValue ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500/40' : 'bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-500/40'">
+                                    <span>🏆</span>
+                                    <span>Recommended Strategy</span>
+                                </span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                    {{ timeframe === 'annual' ? '12-Month Projection' : 'Monthly Calculation' }}
                                 </span>
                             </div>
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Points from Rent</span>
-                                <span class="font-bold text-indigo-400">+{{ way1.rentPts.toLocaleString() }} <span class="text-xs font-normal text-slate-500">pts</span></span>
+
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-tight">
+                                Choose
+                                <span
+                                    :class="way1TotalValue >= way2TotalValue ? 'text-emerald-600 dark:text-emerald-400 underline decoration-emerald-500/40 underline-offset-4' : 'text-indigo-600 dark:text-indigo-400 underline decoration-indigo-500/40 underline-offset-4'">
+                                    {{ way1TotalValue >= way2TotalValue ? 'Way 1: Housing Rewards' : 'Way 2: Cash Back'
+                                    }}
+                                </span>
+                            </h2>
+
+                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                                <template v-if="way1TotalValue >= way2TotalValue">
+                                    At your <strong>{{ way1.ratio }}%</strong> spend ratio, the <strong>{{ way1.mult > 0
+                                        ? way1.mult + 'x' : 'base' }}</strong> rent multiplier generates more dollar
+                                    value than the 4% cash back alternative.
+                                </template>
+                                <template v-else>
+                                    Your <strong>{{ way1.ratio }}%</strong> spend ratio doesn't yield enough rent points
+                                    to outpace the guaranteed <strong>4.0% Bilt Cash</strong> on your everyday spend.
+                                </template>
+                            </p>
+                        </div>
+
+                        <!-- Value Advantage Badge -->
+                        <div
+                            class="flex flex-col items-start sm:items-end justify-center min-w-[170px] w-full sm:w-auto border-t sm:border-t-0 sm:border-l border-slate-200 dark:border-white/10 pt-4 sm:pt-0 sm:pl-6">
+                            <span
+                                class="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                                Net Advantage
+                            </span>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-3xl sm:text-4xl font-black font-num"
+                                    :class="way1TotalValue >= way2TotalValue ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400'">
+                                    +${{ displayAdvantage.toFixed(2) }}
+                                </span>
+                                <span class="text-xs font-bold text-slate-500 dark:text-slate-400">
+                                    /{{ timeframe === 'annual' ? 'yr' : 'mo' }}
+                                </span>
+                            </div>
+                            <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1">
+                                {{ timeframe === 'annual' ? `(+$${Math.abs(way1TotalValue -
+                                way2TotalValue).toFixed(2)}/mo)` : `(+$${(Math.abs(way1TotalValue - way2TotalValue) *
+                                12).toFixed(2)}/yr)` }}
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. SPEND-TO-RENT RATIO GAUGE & TIER ADVISOR -->
+                <section class="glass-card rounded-3xl p-5 sm:p-6 flex flex-col gap-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3
+                                class="text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                                <span>📊 Everyday Spend-to-Rent Ratio</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Unlocks higher rent point
+                                multipliers for Way 1</p>
+                        </div>
+                        <div class="text-right">
+                            <span
+                                class="text-xl sm:text-2xl font-black font-num text-indigo-600 dark:text-indigo-400">{{
+                                way1.ratio }}%</span>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Progress Track with Interactive Milestones -->
+                    <div class="px-2 pt-2">
+                        <div
+                            class="relative w-full h-3.5 bg-slate-200 dark:bg-slate-900/90 rounded-full border border-slate-300/60 dark:border-white/5">
+                            <!-- Filled Gradient Bar -->
+                            <div class="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 transition-all duration-500 ease-out"
+                                :style="{ width: Math.min(parseFloat(way1.ratio), 100) + '%' }"></div>
+
+                            <!-- Milestone Pins -->
+                            <!-- 25% -->
+                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full border-2 transition-all duration-300"
+                                :class="parseFloat(way1.ratio) >= 25 ? 'bg-cyan-500 dark:bg-cyan-400 border-white shadow-[0_0_10px_#22d3ee]' : 'bg-slate-300 border-slate-400 dark:bg-slate-800 dark:border-slate-600'"
+                                style="left: 25%;"></div>
+                            <!-- 50% -->
+                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full border-2 transition-all duration-300"
+                                :class="parseFloat(way1.ratio) >= 50 ? 'bg-cyan-500 dark:bg-cyan-400 border-white shadow-[0_0_10px_#22d3ee]' : 'bg-slate-300 border-slate-400 dark:bg-slate-800 dark:border-slate-600'"
+                                style="left: 50%;"></div>
+                            <!-- 75% -->
+                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full border-2 transition-all duration-300"
+                                :class="parseFloat(way1.ratio) >= 75 ? 'bg-cyan-500 dark:bg-cyan-400 border-white shadow-[0_0_10px_#22d3ee]' : 'bg-slate-300 border-slate-400 dark:bg-slate-800 dark:border-slate-600'"
+                                style="left: 75%;"></div>
+                            <!-- 100% -->
+                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full border-2 transition-all duration-300"
+                                :class="parseFloat(way1.ratio) >= 100 ? 'bg-cyan-500 dark:bg-cyan-400 border-white shadow-[0_0_10px_#22d3ee]' : 'bg-slate-300 border-slate-400 dark:bg-slate-800 dark:border-slate-600'"
+                                style="left: 100%;"></div>
+                        </div>
+
+                        <!-- Labels underneath pins -->
+                        <div
+                            class="relative w-full h-9 mt-2 text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 0%;">
+                                <span class="block text-slate-700 dark:text-slate-300">Flat 250</span>
+                                <span class="text-[9px] text-slate-400 dark:text-slate-500 font-normal">&lt;25%</span>
+                            </span>
+                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 25%;">
+                                <span class="block text-cyan-600 dark:text-cyan-300 font-extrabold">0.50x</span>
+                                <span class="text-[9px] text-slate-400 dark:text-slate-500 font-normal">25%</span>
+                            </span>
+                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 50%;">
+                                <span class="block text-cyan-600 dark:text-cyan-300 font-extrabold">0.75x</span>
+                                <span class="text-[9px] text-slate-400 dark:text-slate-500 font-normal">50%</span>
+                            </span>
+                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 75%;">
+                                <span class="block text-cyan-600 dark:text-cyan-300 font-extrabold">1.00x</span>
+                                <span class="text-[9px] text-slate-400 dark:text-slate-500 font-normal">75%</span>
+                            </span>
+                            <span class="absolute transform -translate-x-1/2 text-center" style="left: 100%;">
+                                <span class="block text-emerald-600 dark:text-emerald-400 font-black">1.25x</span>
+                                <span class="text-[9px] text-slate-400 dark:text-slate-500 font-normal">100%</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Next Tier Recommendation Banner -->
+                    <div
+                        class="bg-indigo-50 border border-indigo-200 text-indigo-950 dark:bg-indigo-950/40 dark:border-indigo-800/30 dark:text-indigo-200 rounded-2xl p-3.5 text-xs flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-lg flex-shrink-0">🚀</span>
+                            <span class="font-medium leading-relaxed">{{ nextTierAdvisor.message }}</span>
+                        </div>
+                        <button v-if="nextTierAdvisor.needed > 0" @click="spendRest += nextTierAdvisor.needed"
+                            class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] whitespace-nowrap shadow-sm transition-all cursor-pointer">
+                            +Add ${{ Math.ceil(nextTierAdvisor.needed) }}
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 3. DETAILED COMPARISON CARDS (Way 1 vs Way 2) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5" id="comparison-cards-section">
+
+                    <!-- WAY 1: HOUSING REWARDS CARD -->
+                    <article
+                        class="glass-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between relative transition-all duration-300 hover:border-slate-300 dark:hover:border-white/20"
+                        :class="way1TotalValue >= way2TotalValue ? 'border-emerald-500/50 dark:border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/10' : 'border-slate-200/80 dark:border-white/[0.08]'">
+
+                        <div>
+                            <!-- Header with badge -->
+                            <div class="flex justify-between items-start mb-5">
+                                <div>
+                                    <span
+                                        class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 tracking-widest uppercase">Option
+                                        A</span>
+                                    <h3 class="text-xl font-black text-slate-900 dark:text-white mt-0.5">Way 1: Housing
+                                    </h3>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Points on Rent +
+                                        Everyday</p>
+                                </div>
+                                <span v-if="way1TotalValue >= way2TotalValue"
+                                    class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-400 uppercase tracking-wider border border-emerald-300 dark:border-emerald-500/30">
+                                    Winner
+                                </span>
+                            </div>
+
+                            <!-- Line items breakdown -->
+                            <div class="flex flex-col gap-2.5 text-xs">
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Rent Day Spend
+                                        (2x/1x)</span>
+                                    <span class="font-num font-bold text-slate-800 dark:text-white">{{ (way1.pts1st *
+                                        timeframeMultiplier).toLocaleString() }} <span
+                                            class="text-slate-400 dark:text-slate-500 text-[10px]">pts</span></span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Rest of Month
+                                        (1x)</span>
+                                    <span class="font-num font-bold text-slate-800 dark:text-white">{{ (way1.ptsRest *
+                                        timeframeMultiplier).toLocaleString() }} <span
+                                            class="text-slate-400 dark:text-slate-500 text-[10px]">pts</span></span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Everyday Points
+                                        Total</span>
+                                    <span class="font-num font-bold text-indigo-600 dark:text-indigo-300">{{
+                                        (way1.everydayPts * timeframeMultiplier).toLocaleString() }} <span
+                                            class="text-slate-400 dark:text-slate-500 text-[10px]">pts</span></span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Rent Multiplier
+                                        Tier</span>
+                                    <span
+                                        class="font-bold text-indigo-700 bg-indigo-100 dark:text-indigo-400 dark:bg-indigo-950/60 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800/40 text-[11px]">
+                                        {{ way1.mult > 0 ? way1.mult + 'x' : 'Flat 250' }}
+                                    </span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Points from Rent</span>
+                                    <span class="font-num font-extrabold text-indigo-600 dark:text-indigo-400">+{{
+                                        (way1.rentPts * timeframeMultiplier).toLocaleString() }} <span
+                                            class="text-slate-400 dark:text-slate-500 text-[10px]">pts</span></span>
+                                </div>
                             </div>
                         </div>
-                        
-                        <!-- Footer / Totals -->
-                        <div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-end">
+
+                        <!-- Card Footer -->
+                        <div
+                            class="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex justify-between items-end">
                             <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Points</p>
-                                <p class="text-2xl font-black text-white leading-none">{{ way1.totalPts.toLocaleString() }} <span class="text-sm font-semibold text-slate-400">pts</span></p>
+                                <p
+                                    class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">
+                                    Total Points</p>
+                                <p class="text-lg font-black font-num text-slate-900 dark:text-white leading-none">
+                                    {{ (way1.totalPts * timeframeMultiplier).toLocaleString() }} <span
+                                        class="text-xs text-slate-400 font-normal">pts</span>
+                                </p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Monthly Value</p>
-                                <p class="text-3xl font-black text-emerald-400 leading-none">${{ way1TotalValue.toFixed(2) }}</p>
+                                <p
+                                    class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">
+                                    Total {{ timeframe === 'annual' ? 'Annual' : 'Monthly' }} Value
+                                </p>
+                                <p
+                                    class="text-2xl sm:text-3xl font-black font-num text-emerald-600 dark:text-emerald-400 leading-none">
+                                    ${{ (way1TotalValue * timeframeMultiplier).toFixed(2) }}
+                                </p>
                             </div>
                         </div>
                     </article>
 
-                    <!-- Way 2 Card -->
-                    <article class="glass-card rounded-[2rem] p-6 flex flex-col relative transition-all duration-300 hover:scale-[1.01]"
-                         :class="way2TotalValue > way1TotalValue ? 'border-emerald-500/30 bg-emerald-950/5 shadow-[0_0_30px_rgba(16,185,129,0.04)]' : 'border-white/5'">
-                        
-                        <!-- Header -->
-                        <div class="flex justify-between items-start mb-6">
-                            <div>
-                                <span class="text-[10px] font-bold text-indigo-400 tracking-widest uppercase">Option B</span>
-                                <h3 class="text-xl font-extrabold text-white mt-0.5">Way 2: Cash Back</h3>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Cash Back Hybrid Method</p>
+                    <!-- WAY 2: CASH BACK HYBRID CARD -->
+                    <article
+                        class="glass-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between relative transition-all duration-300 hover:border-slate-300 dark:hover:border-white/20"
+                        :class="way2TotalValue > way1TotalValue ? 'border-emerald-500/50 dark:border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/10' : 'border-slate-200/80 dark:border-white/[0.08]'">
+
+                        <div>
+                            <!-- Header with badge -->
+                            <div class="flex justify-between items-start mb-5">
+                                <div>
+                                    <span
+                                        class="text-[10px] font-black text-cyan-600 dark:text-cyan-400 tracking-widest uppercase">Option
+                                        B</span>
+                                    <h3 class="text-xl font-black text-slate-900 dark:text-white mt-0.5">Way 2: Cash
+                                        Back</h3>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Points + 4% Bilt
+                                        Cash</p>
+                                </div>
+                                <span v-if="way2TotalValue > way1TotalValue"
+                                    class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-400 uppercase tracking-wider border border-emerald-300 dark:border-emerald-500/30">
+                                    Winner
+                                </span>
                             </div>
-                            <span v-if="way2TotalValue > way1TotalValue" 
-                                  class="px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 uppercase tracking-wider border border-emerald-500/30">
-                                Best Value
-                            </span>
+
+                            <!-- Line items breakdown -->
+                            <div class="flex flex-col gap-2.5 text-xs">
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Rent Day Spend
+                                        (2x/1x)</span>
+                                    <span class="font-num font-bold text-slate-800 dark:text-white">{{ (way2.pts1st *
+                                        timeframeMultiplier).toLocaleString() }} <span
+                                            class="text-slate-400 dark:text-slate-500 text-[10px]">pts</span></span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Rest of Month
+                                        (1x)</span>
+                                    <span class="font-num font-bold text-slate-800 dark:text-white">{{ (way2.ptsRest *
+                                        timeframeMultiplier).toLocaleString() }} <span
+                                            class="text-slate-400 dark:text-slate-500 text-[10px]">pts</span></span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Everyday Points
+                                        Total</span>
+                                    <span class="font-num font-bold text-slate-800 dark:text-white">{{ (way2.totalPts *
+                                        timeframeMultiplier).toLocaleString() }} <span
+                                            class="text-slate-400 dark:text-slate-500 text-[10px]">pts</span></span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Points Value (@ {{
+                                        pointValuationCents }}¢)</span>
+                                    <span class="font-num font-bold text-slate-700 dark:text-slate-200">${{
+                                        (way2PointsValue * timeframeMultiplier).toFixed(2) }}</span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium">Bilt Cash (4.0%
+                                        flat)</span>
+                                    <span class="font-num font-extrabold text-emerald-600 dark:text-emerald-400">+${{
+                                        (way2.biltCash * timeframeMultiplier).toFixed(2) }}</span>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <!-- Breakdown -->
-                        <div class="flex-1 flex flex-col gap-3 text-sm">
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Rent Day Points (2x/1x)</span>
-                                <span class="font-bold text-white">{{ way2.pts1st.toLocaleString() }} <span class="text-xs font-normal text-slate-500">pts</span></span>
-                            </div>
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Rest of Month Points (1x)</span>
-                                <span class="font-bold text-white">{{ way2.ptsRest.toLocaleString() }} <span class="text-xs font-normal text-slate-500">pts</span></span>
-                            </div>
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Everyday Points Total</span>
-                                <span class="font-bold text-white">{{ way2.totalPts.toLocaleString() }} <span class="text-xs font-normal text-slate-500">pts</span></span>
-                            </div>
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Points Value (Est.)</span>
-                                <span class="font-bold text-white">${{ way2PointsValue.toFixed(2) }}</span>
-                            </div>
-                            <div class="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span class="text-slate-400 font-medium">Bilt Cash (4.0% flat)</span>
-                                <span class="font-bold text-emerald-400">+${{ way2.biltCash.toFixed(2) }}</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Footer / Totals -->
-                        <div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-end">
+
+                        <!-- Card Footer -->
+                        <div
+                            class="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex justify-between items-end">
                             <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Rewards</p>
-                                <p class="text-base font-bold text-white leading-none">{{ way2.totalPts.toLocaleString() }} <span class="text-xs text-slate-500">pts</span></p>
-                                <p class="text-base font-bold text-emerald-400 leading-none mt-1.5">+${{ way2.biltCash.toFixed(2) }} <span class="text-xs text-slate-550">cash</span></p>
+                                <p
+                                    class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">
+                                    Total Rewards</p>
+                                <p class="text-xs font-bold font-num text-slate-700 dark:text-slate-300">
+                                    {{ (way2.totalPts * timeframeMultiplier).toLocaleString() }} pts
+                                </p>
+                                <p class="text-xs font-bold font-num text-emerald-600 dark:text-emerald-400">
+                                    +${{ (way2.biltCash * timeframeMultiplier).toFixed(2) }} cash
+                                </p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Combined Value</p>
-                                <p class="text-3xl font-black text-emerald-400 leading-none">${{ way2TotalValue.toFixed(2) }}</p>
+                                <p
+                                    class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">
+                                    Total {{ timeframe === 'annual' ? 'Annual' : 'Monthly' }} Value
+                                </p>
+                                <p
+                                    class="text-2xl sm:text-3xl font-black font-num text-emerald-600 dark:text-emerald-400 leading-none">
+                                    ${{ (way2TotalValue * timeframeMultiplier).toFixed(2) }}
+                                </p>
                             </div>
                         </div>
                     </article>
 
                 </div>
 
-            </div>
-        </main>
+                <!-- 4. BREAK-EVEN SPEND INSIGHT ENGINE -->
+                <section class="glass-card rounded-3xl p-5 sm:p-6 flex flex-col gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">⚖️</span>
+                        <h3 class="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
+                            Break-Even Analysis</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        For a rent of <strong class="text-slate-900 dark:text-white">${{ rent.toLocaleString()
+                            }}</strong> with points valued at <strong class="text-slate-900 dark:text-white">{{
+                            pointValuationCents }}¢</strong>:
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
+                        <div
+                            class="bg-slate-100 dark:bg-white/5 p-3 rounded-2xl border border-slate-200/80 dark:border-white/5">
+                            <span
+                                class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block">Current
+                                Rent Points Value</span>
+                            <span class="text-base font-extrabold font-num text-indigo-600 dark:text-indigo-300">
+                                ${{ (way1.rentPts * (pointValuationCents / 100)).toFixed(2) }}/mo
+                            </span>
+                        </div>
+                        <div
+                            class="bg-slate-100 dark:bg-white/5 p-3 rounded-2xl border border-slate-200/80 dark:border-white/5">
+                            <span
+                                class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block">Current
+                                4% Bilt Cash</span>
+                            <span class="text-base font-extrabold font-num text-emerald-600 dark:text-emerald-300">
+                                ${{ (way2.biltCash).toFixed(2) }}/mo
+                            </span>
+                        </div>
+                        <div
+                            class="bg-slate-100 dark:bg-white/5 p-3 rounded-2xl border border-slate-200/80 dark:border-white/5">
+                            <span
+                                class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block">Break-Even
+                                Everyday Spend</span>
+                            <span class="text-base font-extrabold font-num text-amber-600 dark:text-amber-300">
+                                ${{ breakEvenSpendDisplay }}
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        {{ breakEvenExplanation }}
+                    </p>
+                </section>
 
-        <!-- Sticky Bottom Summary Bar (Mobile Only) -->
-        <div class="fixed bottom-0 left-0 right-0 z-50 glass-card px-5 py-4 flex items-center justify-between border-t border-white/10 lg:hidden shadow-2xl">
-            <div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Best Choice</span>
-                <span class="font-extrabold text-sm text-white flex items-center gap-1.5 mt-0.5">
-                    <span class="w-2 h-2 rounded-full" :class="way1TotalValue >= way2TotalValue ? 'bg-emerald-400 shadow-[0_0_8px_#10b981]' : 'bg-indigo-400 shadow-[0_0_8px_#6366f1]'"></span>
-                    {{ way1TotalValue >= way2TotalValue ? 'Way 1: Housing' : 'Way 2: Cash Back' }}
-                </span>
+                <!-- 5. WHAT-IF SCENARIO SANDBOX (Collapsible / Seamless) -->
+                <section class="glass-card rounded-3xl p-5 sm:p-6 flex flex-col gap-4">
+                    <div class="flex justify-between items-center cursor-pointer" @click="showWhatIf = !showWhatIf">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🧪</span>
+                            <div>
+                                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">What-If
+                                    Scenario Sandbox</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Simulate a future apartment rent
+                                    or budget change</p>
+                            </div>
+                        </div>
+                        <button
+                            class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 flex items-center gap-1">
+                            <span>{{ showWhatIf ? 'Collapse' : 'Expand' }}</span>
+                            <svg class="w-4 h-4 transform transition-transform" :class="showWhatIf ? 'rotate-180' : ''"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div v-show="showWhatIf"
+                        class="flex flex-col gap-4 pt-2 border-t border-slate-200 dark:border-white/10">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <div
+                                    class="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    <span>Hypothetical Spend</span>
+                                    <span class="font-num text-slate-900 dark:text-white">${{ whatIfTotalSpend }}</span>
+                                </div>
+                                <input type="range" v-model.number="whatIfTotalSpend" min="0" max="8000" step="50"
+                                    :style="getSliderBackground(whatIfTotalSpend, 0, 8000, '#6366f1')" class="w-full">
+                            </div>
+                            <div>
+                                <div
+                                    class="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    <span>Hypothetical Rent</span>
+                                    <span class="font-num text-slate-900 dark:text-white">${{ whatIfRent }}</span>
+                                </div>
+                                <input type="range" v-model.number="whatIfRent" min="500" max="6000" step="50"
+                                    :style="getSliderBackground(whatIfRent, 500, 6000, '#06b6d4')" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Sandbox Results Comparison -->
+                        <div
+                            class="bg-slate-100/90 dark:bg-slate-900/80 p-4 rounded-2xl border border-slate-200 dark:border-white/5 flex flex-col gap-3">
+                            <div class="flex justify-between items-center text-xs font-bold">
+                                <span class="text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hypothetical
+                                    Comparison</span>
+                                <span class="text-emerald-600 dark:text-emerald-400">
+                                    {{ whatIfWay1TotalValue >= whatIfWay2TotalValue ? 'Way 1 Wins' : 'Way 2 Wins' }}
+                                    (+${{ Math.abs(whatIfWay1TotalValue - whatIfWay2TotalValue).toFixed(2) }}/mo)
+                                </span>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div>
+                                    <div class="flex justify-between text-xs font-medium mb-1">
+                                        <span class="text-slate-600 dark:text-slate-300">Way 1 (Housing Points)</span>
+                                        <span class="font-num font-bold text-slate-900 dark:text-white">${{
+                                            whatIfWay1TotalValue.toFixed(2) }}/mo</span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 dark:bg-white/5 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-indigo-500 h-full rounded-full transition-all duration-300"
+                                            :style="{ width: (whatIfWay1TotalValue / Math.max(whatIfWay1TotalValue, whatIfWay2TotalValue, 1) * 100) + '%' }">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs font-medium mb-1">
+                                        <span class="text-slate-600 dark:text-slate-300">Way 2 (4% Cash Back)</span>
+                                        <span class="font-num font-bold text-slate-900 dark:text-white">${{
+                                            whatIfWay2TotalValue.toFixed(2) }}/mo</span>
+                                    </div>
+                                    <div class="w-full bg-slate-200 dark:bg-white/5 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-cyan-500 h-full rounded-full transition-all duration-300"
+                                            :style="{ width: (whatIfWay2TotalValue / Math.max(whatIfWay1TotalValue, whatIfWay2TotalValue, 1) * 100) + '%' }">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </div>
-            <div class="text-right">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Monthly Advantage</span>
-                <span class="font-black text-lg" :class="way1TotalValue >= way2TotalValue ? 'text-emerald-400' : 'text-indigo-400'">
-                    +${{ Math.abs(way1TotalValue - way2TotalValue).toFixed(2) }}
-                </span>
+
+        </div>
+
+        <!-- Sticky Floating Decision Dock (Mobile Only) -->
+        <aside
+            class="fixed bottom-0 left-0 right-0 z-50 glass-card-elevated px-4 py-3 border-t border-slate-200 dark:border-white/10 lg:hidden shadow-2xl pb-safe">
+            <div class="max-w-md mx-auto flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                        :class="way1TotalValue >= way2TotalValue ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30' : 'bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/30'">
+                        🏆
+                    </div>
+                    <div>
+                        <span
+                            class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                            Best Strategy ({{ timeframe === 'annual' ? 'Yr' : 'Mo' }})
+                        </span>
+                        <p class="font-black text-xs text-slate-900 dark:text-white">
+                            {{ way1TotalValue >= way2TotalValue ? 'Way 1 (Housing)' : 'Way 2 (Cash Back)' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <div class="text-right">
+                        <span
+                            class="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">Advantage</span>
+                        <span class="font-black font-num text-sm"
+                            :class="way1TotalValue >= way2TotalValue ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400'">
+                            +${{ displayAdvantage.toFixed(2) }}
+                        </span>
+                    </div>
+
+                    <!-- Quick Jump to Inputs or Breakdown -->
+                    <button @click="scrollToSection('input-parameters-section')"
+                        class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 dark:bg-white/10 dark:hover:bg-white/20 dark:active:bg-white/30 dark:text-white font-bold text-xs transition-all cursor-pointer border border-slate-200 dark:border-white/10">
+                        Edit
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Rules & FAQ Modal -->
+        <div v-if="showRulesModal"
+            class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+            <div
+                class="glass-card-elevated max-w-xl w-full rounded-3xl p-6 sm:p-8 flex flex-col gap-5 max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-white/20 shadow-2xl">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-4">
+                    <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>ℹ️ Bilt Blue Card Rewards Rules</span>
+                    </h3>
+                    <button @click="showRulesModal = false"
+                        class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+                        ✕
+                    </button>
+                </div>
+
+                <div class="space-y-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <div
+                        class="bg-indigo-50 dark:bg-indigo-950/30 p-3.5 rounded-2xl border border-indigo-200 dark:border-indigo-800/30">
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">Way 1: Housing Rewards</h4>
+                        <p>Under Way 1, you earn points on your rent payment based on your Everyday Spend-to-Rent Ratio:
+                        </p>
+                        <ul class="list-disc pl-4 mt-1.5 space-y-1 text-slate-600 dark:text-slate-300">
+                            <li><strong>&lt; 25% ratio:</strong> Flat 250 base points.</li>
+                            <li><strong>25% - 49.9% ratio:</strong> 0.50x rent multiplier.</li>
+                            <li><strong>50% - 74.9% ratio:</strong> 0.75x rent multiplier.</li>
+                            <li><strong>75% - 99.9% ratio:</strong> 1.00x rent multiplier.</li>
+                            <li><strong>≥ 100% ratio:</strong> 1.25x rent multiplier (max).</li>
+                            <li><strong>Rent Day (1st):</strong> Earn 2x points on the first $500 of spend (up to 1,000
+                                pts), 1x thereafter.</li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-cyan-50 dark:bg-cyan-950/30 p-3.5 rounded-2xl border border-cyan-200 dark:border-cyan-800/30">
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">Way 2: Cash Back Alternative</h4>
+                        <p>Under Way 2, instead of earning rent multiplier points, you earn:</p>
+                        <ul class="list-disc pl-4 mt-1.5 space-y-1 text-slate-600 dark:text-slate-300">
+                            <li><strong>Standard Points:</strong> Everyday spend earns points (2x on 1st up to $500, 1x
+                                rest).</li>
+                            <li><strong>4.0% Bilt Cash:</strong> Flat 4% cash back on all non-rent everyday card spend.
+                            </li>
+                            <li><strong>No Rent Points:</strong> No rent multiplier bonus points are awarded.</li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-slate-100 dark:bg-white/5 p-3.5 rounded-2xl border border-slate-200 dark:border-white/10">
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">Which should you pick?</h4>
+                        <p>If your everyday spend easily reaches 50%-100% of your rent, Way 1 often wins because the
+                            rent points bonus is substantial. If your rent is high and you don't spend much on the card,
+                            or if you prefer pure cash back over airline/hotel transfer points, Way 2 is the better
+                            choice.</p>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                    <button @click="showRulesModal = false"
+                        class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-white text-xs transition-all cursor-pointer">
+                        Got it!
+                    </button>
+                </div>
             </div>
         </div>
 
     </div>
 
+    <!-- Vue 3 Application Script -->
     <script>
-        const { createApp, ref, computed } = Vue;
+        const { createApp, ref, computed, onMounted } = Vue;
 
         createApp({
             setup() {
-                // Calculator parameters (synced via v-model range + number inputs)
+                // Theme Management
+                const getInitialTheme = () => {
+                    const saved = localStorage.getItem('bilt_theme');
+                    if (saved) return saved === 'dark';
+                    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                };
+
+                const isDark = ref(getInitialTheme());
+
+                const applyTheme = (dark) => {
+                    if (dark) {
+                        document.documentElement.classList.add('dark');
+                        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#070913');
+                        localStorage.setItem('bilt_theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f8fafc');
+                        localStorage.setItem('bilt_theme', 'light');
+                    }
+                };
+
+                const toggleTheme = () => {
+                    isDark.value = !isDark.value;
+                    applyTheme(isDark.value);
+                };
+
+                // Apply initial theme immediately
+                applyTheme(isDark.value);
+
+                // Calculator parameters
                 const rent = ref(2000);
                 const spend1st = ref(500);
                 const spendRest = ref(1500);
-                const pointValuationCents = ref(1.0); // 1.0 cents per point default
+                const pointValuationCents = ref(1.0); // 1.0¢ default (1 cent)
+                const timeframe = ref('monthly'); // 'monthly' | 'annual'
 
-                // Playground Parameters
+                // What-If Sandbox parameters
+                const showWhatIf = ref(false);
                 const whatIfTotalSpend = ref(1500);
                 const whatIfRent = ref(2000);
 
-                // Tab management on Mobile
-                const activeTab = ref('calculator');
+                // Modal state
+                const showRulesModal = ref(false);
 
+                // Point valuation presets
+                const valuationPresets = [
+                    { val: 0.8, label: 'Floor' },
+                    { val: 1.0, label: 'Standard' },
+                    { val: 1.25, label: 'Portal' },
+                    { val: 1.5, label: 'Hyatt/Air' },
+                    { val: 2.0, label: 'Max' }
+                ];
+
+                // Timeframe multiplier (1 for monthly, 12 for annual)
+                const timeframeMultiplier = computed(() => timeframe.value === 'annual' ? 12 : 1);
+
+                // Calculations
                 const calculateWay1 = (currentSpend1st, currentSpendRest, currentRent) => {
-                    let s1 = currentSpend1st || 0;
-                    let sR = currentSpendRest || 0;
-                    let r = currentRent || 0;
-                    let totalS = s1 + sR;
+                    const s1 = Number(currentSpend1st) || 0;
+                    const sR = Number(currentSpendRest) || 0;
+                    const r = Number(currentRent) || 0;
+                    const totalS = s1 + sR;
 
-                    let pts1st = Math.min(s1, 500) * 2 + Math.max(s1 - 500, 0) * 1;
-                    let ptsRest = sR * 1;
-                    let everydayPts = pts1st + ptsRest;
+                    const pts1st = Math.min(s1, 500) * 2 + Math.max(s1 - 500, 0) * 1;
+                    const ptsRest = sR * 1;
+                    const everydayPts = pts1st + ptsRest;
 
-                    let ratio = r > 0 ? totalS / r : 0;
+                    const ratio = r > 0 ? totalS / r : 0;
                     let mult = 0;
                     let rentPts = 250; // base points if threshold not met
 
@@ -632,15 +1224,15 @@
                 };
 
                 const calculateWay2 = (currentSpend1st, currentSpendRest) => {
-                    let s1 = currentSpend1st || 0;
-                    let sR = currentSpendRest || 0;
+                    const s1 = Number(currentSpend1st) || 0;
+                    const sR = Number(currentSpendRest) || 0;
 
-                    let pts1st = Math.min(s1, 500) * 2 + Math.max(s1 - 500, 0) * 1;
-                    let ptsRest = sR * 1;
-                    let totalPts = pts1st + ptsRest;
+                    const pts1st = Math.min(s1, 500) * 2 + Math.max(s1 - 500, 0) * 1;
+                    const ptsRest = sR * 1;
+                    const totalPts = pts1st + ptsRest;
 
-                    let allSpendForCash = s1 + sR;
-                    let biltCash = allSpendForCash * 0.04;
+                    const allSpendForCash = s1 + sR;
+                    const biltCash = allSpendForCash * 0.04;
 
                     return {
                         pts1st,
@@ -655,14 +1247,17 @@
                 const way2 = computed(() => calculateWay2(spend1st.value, spendRest.value));
 
                 const way1TotalValue = computed(() => way1.value.totalPts * (pointValuationCents.value / 100));
-
                 const way2PointsValue = computed(() => way2.value.totalPts * (pointValuationCents.value / 100));
                 const way2TotalValue = computed(() => way2PointsValue.value + way2.value.biltCash);
 
-                // What If calculations
+                const displayAdvantage = computed(() => {
+                    const diff = Math.abs(way1TotalValue.value - way2TotalValue.value);
+                    return diff * timeframeMultiplier.value;
+                });
+
+                // What-If Sandbox Calculations
                 const whatIfSpend1st = computed(() => Math.min(whatIfTotalSpend.value || 0, 500));
                 const whatIfSpendRest = computed(() => Math.max(0, (whatIfTotalSpend.value || 0) - 500));
-
                 const whatIfWay1 = computed(() => calculateWay1(whatIfSpend1st.value, whatIfSpendRest.value, whatIfRent.value));
                 const whatIfWay2 = computed(() => calculateWay2(whatIfSpend1st.value, whatIfSpendRest.value));
 
@@ -670,49 +1265,112 @@
                 const whatIfWay2PointsValue = computed(() => whatIfWay2.value.totalPts * (pointValuationCents.value / 100));
                 const whatIfWay2TotalValue = computed(() => whatIfWay2PointsValue.value + whatIfWay2.value.biltCash);
 
-                // Next tier logic computation
-                const nextTierTip = computed(() => {
-                    let r = rent.value || 0;
-                    if (r === 0) return "Please enter a valid rent amount.";
-                    let totalSpend = spend1st.value + spendRest.value;
-                    let ratioVal = totalSpend / r;
-                    
+                // Tier Advisor logic
+                const nextTierAdvisor = computed(() => {
+                    const r = Number(rent.value) || 0;
+                    if (r === 0) return { message: "Please enter a valid monthly rent.", needed: 0 };
+                    const totalSpend = (Number(spend1st.value) || 0) + (Number(spendRest.value) || 0);
+                    const ratioVal = totalSpend / r;
+
                     if (ratioVal < 0.25) {
-                        let needed = 0.25 * r - totalSpend;
-                        return `Spend $${Math.ceil(needed)} more to unlock the 0.50x multiplier.`;
+                        const needed = Math.max(0, 0.25 * r - totalSpend);
+                        return { message: `Spend $${Math.ceil(needed)} more to unlock the 0.50x rent multiplier!`, needed };
                     } else if (ratioVal < 0.50) {
-                        let needed = 0.50 * r - totalSpend;
-                        return `Spend $${Math.ceil(needed)} more to unlock the 0.75x multiplier.`;
+                        const needed = Math.max(0, 0.50 * r - totalSpend);
+                        return { message: `Spend $${Math.ceil(needed)} more to unlock the 0.75x rent multiplier!`, needed };
                     } else if (ratioVal < 0.75) {
-                        let needed = 0.75 * r - totalSpend;
-                        return `Spend $${Math.ceil(needed)} more to unlock the 1.00x multiplier.`;
+                        const needed = Math.max(0, 0.75 * r - totalSpend);
+                        return { message: `Spend $${Math.ceil(needed)} more to unlock the 1.00x rent multiplier!`, needed };
                     } else if (ratioVal < 1.00) {
-                        let needed = 1.00 * r - totalSpend;
-                        return `Spend $${Math.ceil(needed)} more to unlock the 1.25x multiplier (Max).`;
+                        const needed = Math.max(0, 1.00 * r - totalSpend);
+                        return { message: `Spend $${Math.ceil(needed)} more to reach maximum 1.25x rent multiplier!`, needed };
                     } else {
-                        return "Maximum 1.25x rent multiplier reached! 🎉";
+                        return { message: "🎉 Top tier unlocked! You are earning maximum 1.25x points on your rent.", needed: 0 };
                     }
                 });
 
+                // Break-Even Analysis
+                const breakEvenSpendDisplay = computed(() => {
+                    const rentVal = Number(rent.value) || 0;
+                    const val = Number(pointValuationCents.value) || 1.0;
+                    if (rentVal <= 0 || val <= 0) return "$0";
+
+                    const currentRentPts = way1.value.rentPts;
+                    const beSpend = (currentRentPts * val) / 4;
+                    return Math.round(beSpend).toLocaleString();
+                });
+
+                const breakEvenExplanation = computed(() => {
+                    const r = Number(rent.value) || 0;
+                    const val = Number(pointValuationCents.value) || 1.0;
+                    const currentRentPts = way1.value.rentPts;
+                    const beSpend = Math.round((currentRentPts * val) / 4);
+                    const currentSpend = (Number(spend1st.value) || 0) + (Number(spendRest.value) || 0);
+
+                    if (currentSpend <= beSpend) {
+                        return `Because your monthly spend ($${currentSpend.toLocaleString()}) is below the break-even spend ($${beSpend.toLocaleString()}), Way 1 yields higher net value from rent bonus points than Way 2's 4% cash back.`;
+                    } else {
+                        return `Because your monthly spend ($${currentSpend.toLocaleString()}) exceeds the break-even spend ($${beSpend.toLocaleString()}), 4% cash back ($${(currentSpend * 0.04).toFixed(2)}) surpasses the dollar value of your rent points ($${(currentRentPts * (val / 100)).toFixed(2)}).`;
+                    }
+                });
+
+                // Helper for reactive dynamic slider background gradient matching theme
+                const getSliderBackground = (value, min, max, color) => {
+                    const val = Number(value) || min;
+                    const percentage = Math.min(100, Math.max(0, ((val - min) / (max - min)) * 100));
+                    const emptyTrack = isDark.value ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+                    return {
+                        background: `linear-gradient(to right, ${color} 0%, ${color} ${percentage}%, ${emptyTrack} ${percentage}%, ${emptyTrack} 100%)`
+                    };
+                };
+
+                const resetDefaults = () => {
+                    rent.value = 2000;
+                    spend1st.value = 500;
+                    spendRest.value = 1500;
+                    pointValuationCents.value = 1.0;
+                    timeframe.value = 'monthly';
+                };
+
+                const scrollToSection = (id) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                };
+
                 return {
+                    isDark,
+                    toggleTheme,
                     rent,
                     spend1st,
                     spendRest,
                     pointValuationCents,
+                    timeframe,
+                    timeframeMultiplier,
+                    showWhatIf,
+                    whatIfTotalSpend,
+                    whatIfRent,
+                    showRulesModal,
+                    valuationPresets,
                     way1,
                     way2,
                     way1TotalValue,
                     way2PointsValue,
                     way2TotalValue,
-                    whatIfTotalSpend,
-                    whatIfRent,
+                    displayAdvantage,
                     whatIfWay1TotalValue,
                     whatIfWay2TotalValue,
-                    nextTierTip,
-                    activeTab
+                    nextTierAdvisor,
+                    breakEvenSpendDisplay,
+                    breakEvenExplanation,
+                    getSliderBackground,
+                    resetDefaults,
+                    scrollToSection
                 };
             }
         }).mount('#app');
     </script>
 </body>
+
 </html>
